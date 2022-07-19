@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --partition=savio3_htc
+#SBATCH --account=fc_blackman
+#SBATCH --job-name=r2_bwa
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --time=72:00:00
+#SBATCH --error=/global/scratch/users/victorcg/pipeline/files/round2/trims/bwa_outputs/BWA.%A_%a.out
+#SBATCH --output=/global/scratch/users/victorcg/pipeline/files/round2/trims/bwa_outputs/BWA.%A_%a.err
+#SBATCH --mail-user=example@email.edu
+#SBATCH --mail-type=All
+#SBATCH --array=1-94
+#SBATCH --mem=100GB
+#SBATCH --cpus-per-task=16
+
+cd /global/scratch/users/victorcg/pipeline/files/round2/trims
+
+module load bwa
+
+SAMPLE=`ls *_R1.trim.fastq.gz | head -n $SLURM_ARRAY_TASK_ID | tail -n 1` ;
+PREFIX=`basename $SAMPLE _R1.trim.fastq.gz` ;
+
+bwa mem -t 16 Mguttatus_256_v2.0.fa ${PREFIX}_R1.trim.fastq.gz ${PREFIX}_R2.trim.fastq.gz > ${PREFIX}.sam
+
+#parallelized bwa allignment
+#warning: utilizes A LOT of computing power (16 cores per task)
