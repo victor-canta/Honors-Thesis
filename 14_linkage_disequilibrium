@@ -1,0 +1,37 @@
+#Make ref fasta for each chromosome
+for i in {1..14}; \
+do samtools faidx Mguttatus_256_v2.0.fa scaffold_${i} > Mgut_v2_chr${i}.fa; done
+
+#2. Determine length of sequence
+grep -v ">" Mgut_v2_chr1.fa | wc -c
+
+#3. Change scaffold_1 to 1 for each chromosome
+for i in {1..14}; \
+do sed -e "s/scaffold_//g" Mgut_v2_chr${i}.fa > Mgut_v2_chr${i}_rename.fa; done
+
+#Removing the scaffold_ from the vcf
+sed -i 's/scaffold_//g' grand_OR.recode.vcf
+
+#Before using plink to trim for LD: annotate variant IDs
+bcftools annotate --set-id +'%CHROM\_%POS\_%REF\_%FIRST_ALT' 23grandest_vf_biallelic_vcftools75_60_sed.vcf
+
+#make bim/fam/bed
+plink2 --allow-extra-chr --vcf 23grandest_vf_vcftools.sed.c1.vcf \
+       --keep-allele-order \
+       --const-fid 0 \
+       --make-bed \
+--out 23grand_plinked
+
+plink2 --allow-extra-chr --bfile 23grand_plinked \
+--indep-pairwise 20 1 0.2 \
+       --out 23grand_LD0.2_1step_20window
+#makes prune.in file
+
+plink2 --allow-extra-chr --bfile 23grand_plinked \
+--extract 23grand_LD0.1_5step_20window.prune.in \
+--make-bed --out 23grand__plinked_LD0.1_1step_20window_Pruned
+#makes bim file that takes prune.in and extracts it from bim
+
+#converts bim to vcf
+plink2 --bfile 23grand__plinked_LD0.5_1step_20window_Pruned --recode vcf-iid --allow-extra-chr --out 23grand_vf_vcftools_pruned0.5.vcf
+
