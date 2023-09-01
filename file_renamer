@@ -1,0 +1,1 @@
+while IFS="," read -r rec1 rec2; do old_name=$rec2; new_name=$rec1; mv ${old_name}_R1.fastq.gz ${new_name}_R1.fastq.gz; mv ${old_name}_R2.fastq.gz ${new_name}_R2.fastq.gz; done < <(cut -d "," -f1,7 FinalKey-USE.csv | tail -n +2)
