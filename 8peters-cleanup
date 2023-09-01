@@ -1,0 +1,10 @@
+#Special thanks to Peter Stokes for providing these scripts.
+
+#Missing data script
+bcftools +setGT db4.vcf -- -t q -i 'FMT/DP=0' -n "./." > missing_data_filter/db4_missingRemoved.vcf
+
+#looped version
+for i in {1..7}; do bcftools +setGT db${i}.vcf -- -t q -i 'FMT/DP=0' -n "./." > missing_data_filter/db${i}_missingRemoved.vcf; done
+
+#my looped version of spanning indel filter script
+for i in {1..7}; do bcftools view -e'ALT="*" || type!="snp"' /global/scratch/users/victorcg/pipeline/23pipeline/missing_data_filter/db${i}_missingRemoved.vcf > /global/scratch/users/victorcg/pipeline/23pipeline/missing_data_filter/spanning_indel_filter/db${i}_missingRemoved_SindelsRemoved.vcf; done
