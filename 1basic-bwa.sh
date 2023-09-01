@@ -11,5 +11,6 @@
 #SBATCH --mail-user=example@email.edu
 #SBATCH --mail-type=All
 
+#aligns fastq reads into a sam
 cd directory
 for f in *_1.fastq; do NAME=`echo $f | cut -d "_" -f 1`; bwa mem -t 7 Mguttatus_256_v2.0.fa ${NAME}_1.fastq ${NAME}_2.fastq > path/$NAME.sam; done
