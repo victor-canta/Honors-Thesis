@@ -1,0 +1,101 @@
+library(dplyr)
+library(tidyr)
+library(matrixStats)
+library(stringr)
+
+# Find directories matching a specific pattern
+directories <- list.dirs(path = "/Users/victorcanto-gallo/Downloads/AWS/soy/test", full.names = TRUE, recursive = FALSE)
+
+# Loop over each directory
+for (directory in directories) {
+  # Extract the directory name
+  directory_name <- basename(directory)
+  
+  # Set the working directory to the current directory
+  setwd(directory)
+  
+  # Get the list of files in the current directory
+  sample_files <- list.files(pattern = ".txt")
+  
+  # Create an empty list to store the tables
+  mylist <- list()
+  
+  # Read and process each file
+  for (x in sample_files) {
+    rawcounts <- data.frame(read.table(x))
+    rawcounts <- rawcounts[5:nrow(rawcounts),]
+    colnames(rawcounts)[1] <- "column 1"
+    colnames(rawcounts)[2] <- "label 2"
+    mylist[(length(mylist) + 1)] <- list(rawcounts)
+  }
+  
+  # Merge the tables into one dataframe
+  counts <- Reduce(function(x, y) merge(x, y, by = "gene", all = TRUE), mylist)
+  counts <- counts[6:nrow(counts),]
+  counts$gene <- str_remove(counts$gene, "problem_string")
+  
+  # Read the gene lengths from the length.txt file
+  reference <- read.delim("/path/to/reference", sep = "\t")
+  reference$common <- str_remove(reference$common, "problem")
+  
+  # Merge the counts dataframe with the lengths dataframe
+  combined <- left_join(counts, reference, by = "common")
+  
+  # Convert counts data to numeric
+  combined[, -1] <- sapply(combined[, -1], as.numeric)
+  
+  # Calculate sample sums
+  sample_sums <- colSums(counts_l[, -1], na.rm = TRUE)
+  
+  # Define function to apply to targets
+  example <- function()
+  }
+  
+
+  
+  # Apply function to get per-sample calculations
+  results <- sapply(counts_l[-1], function(counts) {
+    example(counts, counts_l$length)
+  })
+  
+  # Create a dataframe with results
+  normal_data <- as.data.frame(results)
+  colnames(normal_data) <- paste("File", 1:ncol(normal_data))
+  
+  # Calculate sample average
+  sample_average <- rowMeans(normal_data, na.rm = TRUE)
+  
+  # Create the combined dataframe
+  combined_result <- data.frame(gene = combined$common, sample_average = sample_average)
+  combined_result$sample_stdev <- rowSds(as.matrix(normal_data), na.rm = TRUE)
+  combined$samples = length(counts) - 1
+  
+  split_directory = str_split(directory_name, "_")
+  project = split_directory[[1]][1]
+  combined$project = project
+  
+  # Extract additional information from the directory name
+  split_directory = str_split(directory_name, "_")
+  catalog_gene_expression_id = split_directory[[1]][1]
+  combined = add_column(combined, catalog_gene_expression_id, .before = 1)
+  
+  number = length(sample_files)
+  combined$samples = number
+  
+  ID = split_directory[[1]][2]
+  combined = add_column(combined, ID, .before = 2)
+  
+  info4 = split_directory[[1]][3]
+  combined = add_column(combined, info4, .before = 3)
+  
+  info1 = if (length(split_directory[[1]]) >= 4) split_directory[[1]][4] else NA
+  combined_result = add_column(combined, 1, .before = 4)
+
+  info2 = if (length(split_directory[[1]]) >= 5) split_directory[[1]][5] else NA
+  combined = add_column(combined_result, info2, .before = 5)
+
+    # Save the results file with the directory name
+  file_name = paste0("prefix_", number, "_", directory_name, "_", info1, "_", info2, "_", info3, .tsv")
+  file_path = file.path("/path/", file_name)
+  write.table(combined, sep = "\t", file = file_path, quote = FALSE, row.names = FALSE)
+}
