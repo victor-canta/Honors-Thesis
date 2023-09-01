@@ -1,5 +1,4 @@
-#depth script
-
+#script to get coverage for each sample
 #!/bin/bash
 #SBATCH --job-name=depth
 #SBATCH --partition=savio2_htc
@@ -24,7 +23,7 @@ do seq_name=${i%.bam}; \
 /${seq_name}_depth.txt
 
 
-#coverage script
+#script to get depth for each sample
 
 #!/bin/bash -l
 #SBATCH --job-name=QAPicard
